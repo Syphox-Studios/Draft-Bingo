@@ -10,7 +10,7 @@ There are currently 4 Gamemodes:
 
 If you have more than 2 players then there is another setting called play mode, the 2 options are below:
 1. Free For All: Everyone playing is their own team.
-2. Teams: Players are split in 2 random teams, teammates share a color and any can pick the games and goals.
+2. Teams: Players are split into 2, 3 or 4 random teams, teammates share a color and any can pick the games and goals. 2-player games like Cuphead only come up when every team has 2 players or fewer.
 
 To **Play** click on this link: [syphox-studios.github.io/Draft-Bingo/](https://syphox-studios.github.io/Draft-Bingo/)
 

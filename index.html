@@ -47,6 +47,10 @@
   .swatch:hover:not(:disabled) { border-color: var(--panel); box-shadow: 0 0 0 2px var(--muted); }
   .swatch.active, .swatch.active:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--text); }
   .swatch:disabled { opacity: .2; }
+  /* Colour wheel for a custom colour; once chosen, the colour shows as a dot in the middle */
+  .swatch.custom { position: relative; cursor: pointer; background: conic-gradient(#e5484d, #f5d90a, #30a46c, #12a594, #3e8ef7, #8e4ec6, #d6409f, #e5484d); }
+  .swatch.custom.active::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px var(--panel); }
+  .swatch.custom input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
   .settings { display: grid; gap: 16px; margin: 20px 0 8px; }
   .setting .label { font-weight: 600; margin-bottom: 8px; }
   .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -366,6 +370,7 @@
         <input id="edName" placeholder="Game name" style="flex:1">
         <input id="edImage" placeholder="Photo file in game-photos, e.g. My_Game.png" style="flex:1">
         <label class="row" style="gap:6px"><input type="checkbox" id="edMulti"> Multiplayer (can be played together in the same game)</label>
+        <label class="row" style="gap:6px">Max players <input type="number" id="edMax" min="2" max="8" placeholder="Any" style="width:72px"></label>
       </div>
       <div class="muted" style="margin-bottom:6px">One goal per line. Shown on the board as "Game Name: Goal".</div>
       <textarea id="edGoals"></textarea>
@@ -419,26 +424,30 @@ const DEFAULT_LIBRARY = [
     "Beat Ante 8 on White Stake", "Buy 2 Vouchers from the Shop", "Have 5 Jokers at Once", "Beat Ante 4",
     "Score 50,000 in One Hand", "Have $50 at Once", "Level Up a Poker Hand to Level 5", "Level Up a Poker Hand to Level 10",
     "Open 3 Booster Packs", "Skip the Small and Big Blind and Beat the Boss", "Beat a Boss Blind Without Discarding",
-    "Use 2 Spectral Cards", "Beat Ante 8 on Red Stake", "Beat Ante 10", "Have 6 Jokers at Once" ]},
+    "Use 2 Spectral Cards", "Beat Ante 8 on Red Stake", "Beat Ante 10", "Have 6 Jokers at Once",
+    "Unlock a New Hand (Flush Five, Five of a Kind)" ]},
   { name: "Bloons TD 6", goals: [
-    "Beat Monkey Meadow on Hard", "Beat One Two Tree on Hard", "Beat Resort on Hard", "Beat 10 Beginner Maps on Easy",
-    "Beat 5 Intermediate Maps on Easy", "Beat 5 Advanced Maps on Easy", "Beat 3 Expert Maps on Easy",
-    "Beat Medium 3 Times Using Only Support Monkeys", "Complete the Daily Challenge", "Beat Easy Mode Once Only Using Heroes",
-    "Destroy 5 BFBs (The Red Ones)", "Destroy 10 MOABs (The Blue Ones)", "Beat 5 Beginner Maps on Medium Only Using Primary Monkeys",
-    "Beat 15 Maps in Total on Any Difficulty", "Get All Medals on Easy Mode (Beat Standard, Primary Only, Deflation)",
+    "Beat Monkey Meadow on Hard", "Beat One Two Tree on Hard", "Beat Resort on Hard", "Beat 5 Beginner Maps on Easy",
+    "Beat 4 Intermediate Maps on Easy", "Beat 3 Advanced Maps on Easy", "Beat 2 Expert Maps on Easy",
+    "Beat Medium 3 Times Using Only Support Monkeys", "Complete the Daily Challenge", "Beat Easy Mode Once Only Using a Hero",
+    "Destroy 5 BFBs (The Red Ones)", "Destroy 10 MOABs (The Blue Ones)",
+    "Beat 5 Beginner Maps on Medium Only Using Primary Monkeys", "Beat 15 Maps in Total on Any Difficulty",
+    "Get All Medals on Easy Mode (Beat Standard, Primary Only, Deflation)",
     "Get All Medals on Medium Mode (Beat Standard, Military Only, Reverse, Apopalypse)", "Get a Paragon", "Get a Tier 5",
     "Have All 3 Tier 5 Banana Farms at Once", "Have All 3 Tier 5 Monkey Villages at Once" ]},
   { name: "Celeste", goals: [
     "Complete Chapter 1", "Collect a Crystal Heart", "Collect 5 Strawberries", "Collect 10 Strawberries",
     "Collect 15 Strawberries", "Collect 20 Strawberries", "Collect a Cassette Tape", "Complete Chapter 2",
     "Complete Chapter 1 in Under 5 Minutes", "Die 100 Times", "Collect 3 Winged Strawberries",
-    "Complete 3 Rooms with Traffic Blocks Without Using the Traffic Blocks", "Beat a Chapter Without Breaking Any Crumbling Stone Blocks",
-    "Beat 5 Rooms in a B-Side", "Complete Chapter 1 Without Dying (If You Die You Reset)" ]},
+    "Complete 3 Rooms with Traffic Blocks Without Using the Traffic Blocks",
+    "Beat a Chapter Without Breaking Any Crumbling Stone Blocks", "Beat 5 Rooms in a B-Side",
+    "Complete Chapter 1 Without Dying (If You Die You Reset)" ]},
   { name: "Cuphead", goals: [
     "Beat The Root Pack on Regular", "Beat Goopy Le Grande on Regular", "Beat Cagney Carnation on Regular",
-    "Beat Ribby and Croaks on Regular", "Beat Hilda Berg on Regular", "Beat Forest Follies", "Collect All Coins in Forest Follies",
-    "Beat Treetop Trouble", "Collect All Coins in Treetop Trouble", "Go to Isle 2", "Beat a Mausoleum", "Beat 2 Mausoleums",
-    "Have 10 Coins at Once", "Get an A-Rank", "Beat a Boss on 2-Player Mode" ]},
+    "Beat Ribby and Croaks on Regular", "Beat Hilda Berg on Regular", "Beat Forest Follies",
+    "Collect All Coins in Forest Follies", "Beat Treetop Trouble", "Collect All Coins in Treetop Trouble", "Go to Isle 2",
+    "Beat a Mausoleum", "Beat 2 Mausoleums", "Have 10 Coins at Once", "Get an A-Rank",
+    "Beat a Boss on 2-Player Mode While Only Using 1 Player" ]},
   { name: "Enter the Gungeon", goals: [
     "Beat Floor 1", "Beat Floor 2", "Beat Floor 3", "Have 3 Guns on You at Once", "Have 5 Guns on You at Once",
     "Get a Master Round (Beat a Boss Hitless)", "Have 5 Hearts", "Have 3 Shields", "Open 10 Chests",
@@ -447,18 +456,21 @@ const DEFAULT_LIBRARY = [
   { name: "Hollow Knight Silksong", goals: [
     "Beat Moss Mother", "Beat the Bell Beast", "Complete Mossberry Brew Quest", "Find 5 Fleas", "Buy a Map",
     "Have 500 Rosaries at Once", "Unlock 2 Crests", "Defeat Lace", "Rest at 5 Different Benches", "Obtain the Dash",
-    "Have 6 Masks", "Equip 3 Tools", "Kill an Enemy with Its Own Projectile", "Buy Something from Pebb", "Break 2 Rosary Strings" ]},
+    "Have 6 Masks", "Equip 3 Tools", "Kill an Enemy with Its Own Projectile", "Buy Something from Pebb",
+    "Break 2 Rosary Strings" ]},
   { name: "Hollow Knight", goals: [
-    "Free 10 Grubs", "Defeat the False Knight", "Defeat Hornet", "Enter Mosshome", "Buy 2 Maps", "Open 3 Geo Chests",
-    "Get a Pale Ore", "Defeat Mantis Lords", "Buy the Lantern", "Have 500 Geo at Once", "Buy 2 Stag Stations",
-    "Sit at 10 Different Benches", "Beat Gruz Mother", "Have 3 Charms", "Obtain the Mantis Claw" ]},
+    "Free 5 Grubs", "Free 10 Grubs", "Defeat the False Knight", "Defeat Hornet", "Enter Mosshome", "Buy 2 Maps", "Buy 3 Maps",
+    "Open 3 Geo Chests", "Get a Pale Ore", "Defeat Mantis Lords", "Buy the Lantern", "Have 500 Geo at Once",
+    "Buy 2 Stag Stations", "Sit at 10 Different Benches", "Beat Gruz Mother", "Have 3 Charms", "Obtain the Mantis Claw",
+    "Use the Bank" ]},
   { name: "Lethal Company", goals: [
     "Beat Quota 2", "Beat Quota 3", "Beat Quota 4", "Beat Quota 5", "Die to a Coilhead", "Die to the Ghost Girl",
     "Kill a Nutcracker", "Leave the Inside at 10pm and Get Back to Your Ship Safely", "Grab the Apparatus",
     "Find a Whoopie Cushion", "Carry a Weight of 100+ lbs Back to the Ship Safely", "Steal a Bee Nest and Leave the Moon with It",
     "Land on an Eclipsed Moon and Survive Till 10pm", "Carry an Inventory of Metal Items Back to the Ship Whilst It's Stormy",
     "Use an Inverse Teleporter and Get Back to the Ship", "Break a Bridge", "Get Crushed to Death by an Incoming Supply Drop",
-    "Get \"Most Paranoid\" After a Moon", "Die to a Mine, Turret and from Falling", "Have a Full Hotbar from Things You Bought" ]},
+    "Get \"Most Paranoid\" After a Moon", "Die to a Mine, Turret and from Falling",
+    "Have a Full Hotbar from Things You Bought" ]},
   { name: "Minecraft Dungeons II", goals: [
     "Equip a Unique Weapon", "Throw 5 TNT", "Have 5 Enchantment Books", "Get a Talisman", "Unlock All Artifact Slots",
     "Get to Level 10", "Complete 3 Dungeons", "Complete Squid Coast", "Unlock 3 Minecart Stations",
@@ -466,28 +478,30 @@ const DEFAULT_LIBRARY = [
     "Have All Pieces of Your Armour Enchanted", "Have 500 Emeralds at Once" ]},
   { name: "Minecraft Dungeons", goals: [
     "Complete Creeper Woods", "Defeat a Redstone Golem", "Complete Squid Coast", "Find and Complete a Secret Level",
-    "Defeat the Corrupted Cauldron", "Beat a Level with Your Power Level at Half the Recommended Amount",
-    "Eat 5 Pieces of Food", "Collect 5 Different Types of Melee Weapons", "Collect 5 Different Types of Armour",
-    "Have 100+ Arrows at Once", "Have 250 Emeralds at Once", "Have 500 Emeralds at Once", "Beat 15 Floors of the Tower",
-    "Salvage 10 Items", "Salvage 20 Items" ]},
+    "Defeat the Corrupted Cauldron", "Beat a Level with Your Power Level at Half the Recommended Amount", "Eat 5 Pieces of Food",
+    "Collect 5 Different Types of Melee Weapons", "Collect 5 Different Types of Armour", "Have 100+ Arrows at Once",
+    "Have 250 Emeralds at Once", "Have 500 Emeralds at Once", "Beat 15 Floors of the Tower", "Salvage 10 Items",
+    "Salvage 20 Items" ]},
   { name: "Minecraft", goals: [
     "Wear a Piece of Diamond Armour", "Eat 5 Pieces of Unique Food", "Trade with a Villager", "Trade with a Piglin",
-    "Kill a Creeper, Skeleton and a Wandering Trader", "Breed 2 Animals", "Make a Cake",
+    "Kill a Creeper, Skeleton, Zombie and Spider", "Breed 2 Animals", "Bake a Cake",
     "Get a Stack of Any Item That Stacks Up to 64", "Die from a Llama Spitting at You", "Collect 6 Different Types of Logs",
-    "Reach the Height Limit", "Tame a Wolf", "Craft a Full Set of Iron Armour", "Enter the Nether", "Craft an Eye of Ender" ]},
+    "Reach the Height Limit", "Tame a Wolf", "Craft a Full Set of Iron Armour", "Enter the Nether", "Craft an Eye of Ender",
+    "Get All Stone Tools (Sword, Pick, Axe, Shovel, Hoe, Spear)", "Get All Iron Tools (Sword, Pick, Axe, Shovel, Hoe, Spear)",
+    "Upgrade a Piece of Equipment to Netherite", "Collect 8 Different Wool Colours", "Touch Bedrock" ]},
   { name: "Rainbow Six Siege", goals: [
     "Win 1 Game", "Win 2 Games", "Win 3 Games", "Win a 1v2", "Win a 1v3", "Get a Kill with a Knife", "Get a Kill with a Shotgun",
-    "Get a Kill with a Pistol", "Kill Someone While They Are Stuck in a Frost Mat", "Get MVP", "Get a Headshot", "Destroy 5 Drones",
-    "Get a Wallbang Kill", "Reinforce 10 Walls", "Win a Round Without Any of Your Team Dying", "Kill Someone with a Kapkan Trap",
-    "Win a Round by Defusing", "Get 5 Kills with Fuze", "Have the Opposite Team Shoot a Camera You Are Watching Through",
-    "Win 10 Rounds", "Win 20 Rounds" ]},
+    "Get a Kill with a Pistol", "Kill Someone While They Are Stuck in a Frost Mat", "Get MVP", "Get a Headshot",
+    "Destroy 5 Drones", "Get a Wallbang Kill", "Reinforce 10 Walls", "Win a Round Without Any of Your Team Dying",
+    "Kill Someone with a Kapkan Trap", "Win a Round by Defusing", "Get 5 Kills with Fuze",
+    "Have the Opposite Team Shoot a Camera You Are Watching Through", "Win 10 Rounds" ]},
   { name: "Risk of Rain 2", goals: [
-    "Defeat an Elite-Type Monster", "Complete 3 Teleporter Events", "Complete 5 Teleporter Events", "Have 10 Items", "Have 15 Items",
-    "Have 20 Items", "Beat the First Teleporter Event with Commando and Huntress", "Have $100", "Have 3 of the Same Item",
-    "Have 5 of the Same Item", "Get to Level 10", "Get to Level 15", "Repair 5 Drones/Turrets",
-    "Repair a Gunner Drone, Healing Drone and Missile Drone", "Beat the First Boss in Under 5 Minutes", "Have 10 Unique White Items",
-    "Beat the First Boss with No Items", "Get a Red Item", "Have 5 Green Items", "Have an Enemy with 3 Debuffs at Once",
-    "Have 200 Max Health", "Have 300 Max Health" ]},
+    "Defeat an Elite-Type Monster", "Complete 3 Teleporter Events", "Complete 5 Teleporter Events", "Have 10 Items",
+    "Have 15 Items", "Have 20 Items", "Beat the First Teleporter Event with Commando and Huntress", "Have $100",
+    "Have 3 of the Same Item", "Have 5 of the Same Item", "Get to Level 10", "Get to Level 15", "Repair 5 Drones/Turrets",
+    "Repair a Gunner Drone, Healing Drone and Missile Drone", "Beat the First Boss in Under 5 Minutes",
+    "Have 10 Unique White Items", "Beat the First Boss with No Items", "Get a Red Item", "Have 5 Green Items",
+    "Have an Enemy with 3 Debuffs at Once", "Have 250 Max Health", "Have 350 Max Health" ]},
   { name: "Spiderheck", goals: [
     "Reach Wave 10 in Survival", "Reach Wave 20 in Survival", "Reach Wave 30 in Survival",
     "Get to Wave 10 with Only Particle Blades", "Get to Wave 15 with Only Explosives", "Get to Wave 10 with Only Gravity Weapons",
@@ -495,21 +509,22 @@ const DEFAULT_LIBRARY = [
     "Beat All of Tier 2 in Tiers of Heck", "Have an Enemy Die to the Death Zone", "Get a Level 2 Perk in Survival Mode",
     "Win a Wave Without Picking Up a Weapon", "Get a Double Kill with a Grenade", "Complete a Parkour Course" ]},
   { name: "Stardew Valley", goals: [
-    "Reach Farming Level 3", "Make 1,000g from Farming", "Reach Floor 25 of the Mines", "Find a Diamond", "Upgrade Your Pickaxe",
-    "Reach Combat Level 3", "Get a Treasure Chest in the Mines", "Give Someone a Gift They Love", "Get 2 Hearts with Any NPC",
-    "Get 3 Hearts with Any NPC", "Complete a Relationship Event", "Reach Fishing Level 3", "Reach Fishing Level 5",
-    "Make 10,000g Overall", "Find 10 Items for the Museum", "Find 20 Items for the Museum", "Craft a Furnace and Chest",
-    "Build a Well", "Scare Off a Crow with a Scarecrow", "Talk to All Townsfolk" ]},
+    "Reach Farming Level 3", "Make 1,000g from Farming", "Make 1,000g from Farming in One Day", "Reach Floor 25 of the Mines",
+    "Find a Diamond", "Upgrade Your Pickaxe", "Reach Combat Level 3", "Get a Treasure Chest in the Mines",
+    "Give Someone a Gift They Love", "Get 2 Hearts with Any NPC", "Get 3 Hearts with Any NPC", "Complete a Relationship Event",
+    "Reach Fishing Level 3", "Reach Fishing Level 5", "Make 10,000g Overall", "Find 10 Items for the Museum",
+    "Find 20 Items for the Museum", "Craft a Furnace and Chest", "Build a Well", "Scare Off a Crow with a Scarecrow",
+    "Talk to All Townsfolk", "Get the Backpack", "Get 3 Gold Star Items" ]},
   { name: "Subnautica", goals: [
     "Build the Seamoth", "Build the Cyclops", "Eat 3 Fruits/Veg", "Make a Laser Cutter", "Make the Repair Tool",
-    "Repair Your Escape Pod", "Do a Lap Around the Aurora", "Have Your Base Get Flooded", "Scan 2 Reapers",
+    "Repair Your Escape Pod", "Do a Lap Around the Aurora", "Have Your Base Get Flooded", "Scan 2 Reaper Species",
     "Visit Mountain Island", "Get a Diamond", "Have a Full Inventory of Titanium", "Reach 200M in Depth", "Build a Seaglide",
-    "Scan 15 Animals" ]},
+    "Scan 15 Animals", "Scan 25 Things" ]},
   { name: "Terraria", goals: [
-    "Get a Hook", "Beat the Eye of Cthulhu", "Beat King Slime", "Beat Skeletron", "Beat the Goblin Army",
-    "Have 4 NPCs Move In", "Get Full Hellstone Armour", "Have 10 Hearts", "Have 5 Mana Crystals",
-    "Have 5 Different Crafting Stations", "Have 10 Gold Coins", "Beat a Boss While Wearing No Armour", "Get to Hell",
-    "Touch the Top of the World", "Obtain a Bed" ]},
+    "Get a Hook", "Beat the Eye of Cthulhu", "Beat King Slime", "Beat Skeletron", "Beat the Goblin Army", "Have 4 NPCs Move In",
+    "Get Full Hellstone Armour", "Have 10 Hearts", "Have 5 Mana Crystals", "Have 5 Different Crafting Stations",
+    "Have 10 Gold Coins", "Beat a Boss While Wearing No Armour", "Get to Hell", "Touch the Top of the World", "Obtain a Bed",
+    "Use a Gravitation Potion" ]},
   { name: "TABS", goals: [
     "Beat All of the Simulation Campaign", "Beat 10 Campaign Levels", "Beat 20 Campaign Levels", "Beat 30 Campaign Levels",
     "Beat 3 Campaign Levels Only Using Halflings", "Beat 5 Campaign Levels Only Using Farmer Faction",
@@ -552,6 +567,10 @@ const MULTIPLAYER_GAMES = new Set([
   "Rainbow Six Siege", "Risk of Rain 2", "Spiderheck", "Stardew Valley", "Terraria",
 ]);
 function isMultiplayer(g) { return g.multi ?? MULTIPLAYER_GAMES.has(g.name); }
+// Most players that can play a multiplayer game together (null = no limit). A game's own `maxPlayers`
+// (set in the Game Library editor, 0 = no limit) overrides this.
+const MAX_PLAYERS_PER_GAME = { "Cuphead": 2, "Enter the Gungeon": 2 };
+function maxPlayersOf(g) { return (g.maxPlayers ?? MAX_PLAYERS_PER_GAME[g.name]) || null; }
 
 const LIB_KEY = "draftBingo.library.v1";
 const MATCH_KEY = "draftBingo.match.v1";
@@ -579,7 +598,7 @@ function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"
 let library = load(LIB_KEY, null) || structuredClone(DEFAULT_LIBRARY);
 
 // When the default games change, replace a saved library with them (once per version)
-const DEFAULTS_VERSION = 10;
+const DEFAULTS_VERSION = 11;
 const VERSION_KEY = "draftBingo.defaultsVersion";
 // Games added by an update, so the owned-games popup can pre-tick them for returning players
 const ADDED_KEY = "draftBingo.addedGames";
@@ -624,23 +643,29 @@ function refresh() {
 }
 
 // ---------- Colours ----------
+// Seven named colours, plus a custom one from the colour wheel, stored as "#rrggbb"
 const COLORS = [
   { id: "red", name: "Red", hex: "#e5484d" },
-  { id: "blue", name: "Blue", hex: "#3e8ef7" },
-  { id: "green", name: "Green", hex: "#30a46c" },
   { id: "orange", name: "Orange", hex: "#f76b15" },
-  { id: "purple", name: "Purple", hex: "#8e4ec6" },
-  { id: "teal", name: "Teal", hex: "#12a594" },
+  { id: "yellow", name: "Yellow", hex: "#f5d90a" },
+  { id: "green", name: "Green", hex: "#30a46c" },
+  { id: "blue", name: "Blue", hex: "#3e8ef7" },
   { id: "pink", name: "Pink", hex: "#d6409f" },
-  { id: "brown", name: "Brown", hex: "#ad7f58" },
+  { id: "purple", name: "Purple", hex: "#8e4ec6" },
 ];
-const MAX_PLAYERS = COLORS.length;
-function isColor(id) { return COLORS.some(c => c.id === id); }
-function colorHex(id) { return (COLORS.find(c => c.id === id) || COLORS[0]).hex; }
-function colorName(id) { return (COLORS.find(c => c.id === id) || COLORS[0]).name; }
+const MAX_PLAYERS = 8;
+// Order new players are given colours in, then custom colours once the named ones run out
+const DEFAULT_COLORS = ["red", "blue", "green", "orange", "purple", "pink", "yellow", "#12a594", "#ad7f58", "#9ba1a6"];
+const OLD_COLORS = { teal: "#12a594", brown: "#ad7f58" }; // named colours from earlier versions
+function isCustomColor(id) { return /^#[0-9a-f]{6}$/i.test(id); }
+function isOldColor(id) { return typeof id === "string" && Object.hasOwn(OLD_COLORS, id); }
+function isColor(id) { return COLORS.some(c => c.id === id) || isCustomColor(id) || isOldColor(id); }
+function colorHex(id) { return (COLORS.find(c => c.id === id) || {}).hex || (isCustomColor(id) ? id.toLowerCase() : isOldColor(id) ? OLD_COLORS[id] : COLORS[0].hex); }
+function colorName(id) { return (COLORS.find(c => c.id === id) || {}).name || "Custom"; }
+function sameColor(a, b) { return colorHex(a) === colorHex(b); }
 function softColor(hex) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, .28)`; }
 // First colour not in `taken`, preferring `pref`
-function freeColor(taken, pref) { return [pref, ...COLORS.map(c => c.id)].find(id => isColor(id) && !taken.includes(id)); }
+function freeColor(taken, pref) { return [pref, ...DEFAULT_COLORS].find(id => isColor(id) && !taken.some(t => sameColor(t, id))); }
 // Colours are CSS variables --p1 … --p8 (and soft versions); .p1/.m1/... classes use them.
 // In setup and the lobby slot N is player N; during a match it's side N.
 (function addColorClasses() {
@@ -654,7 +679,7 @@ function freeColor(taken, pref) { return [pref, ...COLORS.map(c => c.id)].find(i
 function applyColors(ids) {
   const root = document.documentElement.style;
   for (let i = 0; i < MAX_PLAYERS; i++) {
-    const hex = colorHex(isColor(ids[i]) ? ids[i] : COLORS[i].id);
+    const hex = colorHex(isColor(ids[i]) ? ids[i] : DEFAULT_COLORS[i]);
     root.setProperty(`--p${i + 1}`, hex);
     root.setProperty(`--p${i + 1}-soft`, softColor(hex));
   }
@@ -664,19 +689,33 @@ function currentColors() {
   if (net.role !== "local") return net.lobby ? net.lobby.players.map(p => p.color) : [];
   return prefs.localPlayers.map(p => p.color);
 }
-// A row of colour swatches; colours in `taken` (other players') can't be chosen
+// A row of colour swatches and a colour wheel; colours in `taken` (other players') can't be chosen
 function renderSwatches(el, selected, taken, onPick) {
   el.innerHTML = "";
+  const isTaken = id => taken.some(t => sameColor(t, id));
   for (const c of COLORS) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "swatch" + (c.id === selected ? " active" : "");
     b.style.setProperty("--c", c.hex);
-    b.title = taken.includes(c.id) ? `${c.name} (taken)` : c.name;
-    b.disabled = taken.includes(c.id);
+    b.title = isTaken(c.id) ? `${c.name} (taken)` : c.name;
+    b.disabled = isTaken(c.id);
     b.onclick = () => onPick(c.id);
     el.appendChild(b);
   }
+  // Custom colour: the wheel shows the chosen colour in its middle once picked
+  const custom = isCustomColor(selected) || isOldColor(selected);
+  const wheel = document.createElement("label");
+  wheel.className = "swatch custom" + (custom ? " active" : "");
+  wheel.title = "Pick your own colour";
+  if (custom) wheel.style.setProperty("--c", colorHex(selected));
+  wheel.innerHTML = `<input type="color" value="${custom ? colorHex(selected) : "#12a594"}">`;
+  wheel.querySelector("input").onchange = e => {
+    const hex = e.target.value.toLowerCase();
+    if (isTaken(hex)) { notice("Someone else already has that colour."); return; }
+    onPick(hex);
+  };
+  el.appendChild(wheel);
 }
 
 // ---------- Preferences (remembered on this device) ----------
@@ -689,11 +728,11 @@ const prefs = Object.assign({
   ownedSeen: {},                             // player name -> games listed when they last chose
 }, load(PREFS_KEY, {}));
 prefs.settings = { size: 5, mode: "lockout", lines: 1, games: 2, plan: 60, timeLimit: 30, timedLockout: true,
-  players: 2, playMode: "ffa", multiOnly: true, ...prefs.settings };
+  players: 2, playMode: "ffa", multiOnly: true, teams: 2, ...prefs.settings };
 // Same-PC players: keep one entry per possible player (older versions saved two names/colours)
 if (prefs.localColors && !prefs.localPlayers.length) prefs.localPlayers = prefs.localColors.map((color, i) => ({ name: `Player ${i + 1}`, color }));
 for (let i = prefs.localPlayers.length; i < MAX_PLAYERS; i++) {
-  prefs.localPlayers.push({ name: `Player ${i + 1}`, color: freeColor(prefs.localPlayers.map(p => p.color), COLORS[i].id) });
+  prefs.localPlayers.push({ name: `Player ${i + 1}`, color: freeColor(prefs.localPlayers.map(p => p.color), DEFAULT_COLORS[i]) });
 }
 function savePrefs() { save(PREFS_KEY, prefs); }
 
@@ -706,13 +745,20 @@ function maxLines(size) { return size * 2 + 2; }
 function planLabel(sec) { return sec === 0 ? "None" : sec < 60 ? `${sec}s` : `${sec / 60} min`; }
 function isLockout(s) { return s.mode === "lockout" || (s.mode === "timed" && s.timedLockout); }
 function isTeams(s) { return s.players > 2 && s.playMode === "teams"; }
-// Sides: who marks squares and drafts. Every player in free-for-all, two teams in Teams.
-function sidesFor(s) { return isTeams(s) ? 2 : s.players; }
+// Up to 4 teams, but at least 2 players a team (3 players can still make 2 teams)
+function maxTeams(players) { return Math.max(2, Math.min(4, Math.floor(players / 2))); }
+function teamCount(s) { return Math.min(Math.max(s.teams || 2, 2), maxTeams(s.players)); }
+// Teams are dealt round-robin, so the biggest team has this many players
+function biggestTeam(s) { return Math.ceil(s.players / teamCount(s)); }
+// Sides: who marks squares and drafts. Every player in free-for-all, each team in Teams.
+function sidesFor(s) { return isTeams(s) ? teamCount(s) : s.players; }
 function totalGames(s) { return sidesFor(s) * s.games; }
 // Lockout fallback target: more than an even share of the squares (13 of 25 with 2 sides, 9 with 3)
 function shareTarget(squares, sides) { return Math.floor(squares / sides) + 1; }
-// Games the draft can use: drafable ones, only multiplayer ones for Teams if that option is on
-function eligibleGames(s) { return library.filter(g => draftable(g) && (!isTeams(s) || !s.multiOnly || isMultiplayer(g))); }
+// Games the draft can use: drafable ones; with Teams' "multiplayer games only", just the multiplayer
+// games every team fits in (Cuphead is 2 players, so not for a team of 3)
+function teamCanPlay(g, s) { const max = maxPlayersOf(g); return isMultiplayer(g) && (!max || max >= biggestTeam(s)); }
+function eligibleGames(s) { return library.filter(g => draftable(g) && (!isTeams(s) || !s.multiOnly || teamCanPlay(g, s))); }
 // Allowed games-per-side range: enough goals to fill the board even if every drafted game has the
 // fewest goals, without drafting more games than exist or than there are squares
 function gamesRange(s) {
@@ -724,7 +770,7 @@ function gamesRange(s) {
   };
 }
 function describeSettings(s) {
-  const who = s.players === 2 ? "2 players" : `${s.players} players, ${isTeams(s) ? `Teams${s.multiOnly ? " (multiplayer games only)" : ""}` : "free for all"}`;
+  const who = s.players === 2 ? "2 players" : `${s.players} players, ${isTeams(s) ? `${teamCount(s)} teams${s.multiOnly ? " (multiplayer games only)" : ""}` : "free for all"}`;
   const head = `${who} · ${s.size}×${s.size} board · ${s.games} game${s.games === 1 ? "" : "s"} each · `;
   const plan = ` · ${s.plan ? planLabel(s.plan) + " planning" : "no planning time"}`;
   if (s.mode === "bingo") return head + `BINGO, first to ${s.lines} line${s.lines === 1 ? "" : "s"}` + plan;
@@ -739,12 +785,14 @@ function matchSettings() {
     size: s.size || 5, mode: s.mode || (match.lockout === false ? "bingo" : "lockout"), lines: s.lines || 1, games: s.games || 2,
     plan: s.plan ?? 0, timeLimit: s.timeLimit || 30, timedLockout: s.timedLockout ?? true,
     players: s.players || match.players.length, playMode: s.playMode || "ffa", multiOnly: s.multiOnly ?? true,
+    teams: s.teams || 2,
   };
 }
 // Match settings picker (local setup and the online lobby). `fixedPlayers`: the fewest players allowed
 // (the online lobby can't drop below the players already in it).
 function renderSettings(el, s, onChange, minPlayers = 2) {
   s.players = Math.max(s.players, minPlayers);
+  s.teams = teamCount(s);
   const range = gamesRange(s);
   s.games = Math.min(Math.max(s.games, range.min), Math.max(range.min, range.max));
   const sides = sidesFor(s), teams = isTeams(s);
@@ -759,8 +807,11 @@ function renderSettings(el, s, onChange, minPlayers = 2) {
         <div class="mode ${!teams ? "active" : ""}" data-play-mode="ffa"><b>Free for all</b>
           <span>Everyone goes for goals by themselves. Each player has their own colour on the board.</span></div>
         <div class="mode ${teams ? "active" : ""}" data-play-mode="teams"><b>Teams</b>
-          <span>Players are split into 2 random teams when the draft starts. Team-mates share a colour and complete goals together.</span>
-          <label class="lines-pick"><input type="checkbox" data-multi-only ${s.multiOnly ? "checked" : ""}> Multiplayer games only</label></div>
+          <span>Players are split into ${s.teams} random teams when the draft starts. Team-mates share a colour and complete goals together.</span>
+          <label class="lines-pick">Teams <select data-teams>${[2, 3, 4].map(n => `<option value="${n}" ${n === s.teams ? "selected" : ""} ${n > maxTeams(s.players) ? "disabled" : ""}>${n}</option>`).join("")}</select>
+            ${maxTeams(s.players) < 4 ? `<span class="muted">${s.players < 6 ? "3 teams need 6+ players" : "4 teams need 8 players"}</span>` : ""}</label>
+          <label class="lines-pick"><input type="checkbox" data-multi-only ${s.multiOnly ? "checked" : ""}> Multiplayer games only</label>
+          ${s.multiOnly && biggestTeam(s) > 2 ? `<span class="muted">2-player games like Cuphead are left out, as a team has ${biggestTeam(s)} players.</span>` : ""}</div>
       </div>
     </div>` : ""}
     <div class="setting"><div class="label">Board size</div>
@@ -801,6 +852,7 @@ function renderSettings(el, s, onChange, minPlayers = 2) {
   on("[data-time-limit]", x => { s.timeLimit = +x.value; }, "onchange");
   on("[data-timed-lockout]", x => { s.timedLockout = x.checked; }, "onchange");
   on("[data-multi-only]", x => { s.multiOnly = x.checked; }, "onchange");
+  on("[data-teams]", x => { s.teams = +x.value; }, "onchange");
   // Clicking a control inside a mode card shouldn't also count as clicking the card
   el.querySelectorAll(".mode input, .mode select").forEach(x => x.addEventListener("click", e => e.stopPropagation()));
 }
@@ -906,7 +958,7 @@ document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { setupM
 function canDraft(s) {
   const needed = totalGames(s), have = eligibleGames(s).length;
   if (have >= needed) return true;
-  notice(`This draft needs ${needed} games, but the library only has ${have} that ${isTeams(s) && s.multiOnly ? "are multiplayer and " : ""}have both goals and a photo.`);
+  notice(`This draft needs ${needed} games, but the library only has ${have} that ${isTeams(s) && s.multiOnly ? `${biggestTeam(s)} players can play together and ` : ""}have both goals and a photo.`);
   return false;
 }
 // players: [{ name, color }]; allowed: names of the games everyone owns (the only ones the draft can offer)
@@ -914,10 +966,13 @@ function newMatch(players, settings, allowed) {
   const s = { ...settings };
   const sides = isTeams(s)
     ? (() => {
-        // Two random teams; each team takes its first member's colour
-        const order = shuffle(players.map((_, i) => i), Math.random), half = Math.ceil(order.length / 2);
-        return [order.slice(0, half), order.slice(half)].map(members =>
-          ({ name: `${colorName(players[members[0]].color)} Team`, color: players[members[0]].color, members: members.sort((a, b) => a - b) }));
+        // Random teams, dealt round-robin so sizes differ by at most one; each team takes its first member's colour
+        const order = shuffle(players.map((_, i) => i), Math.random), T = teamCount(s);
+        return Array.from({ length: T }, (_, t) => order.filter((_, k) => k % T === t)).map(members => {
+          const first = players[members[0]];
+          const name = isCustomColor(first.color) ? `${first.name}'s Team` : `${colorName(first.color)} Team`;
+          return { name, color: first.color, members: members.sort((a, b) => a - b) };
+        });
       })()
     : players.map((p, i) => ({ name: p.name, color: p.color, members: [i] }));
   match = {
@@ -1582,7 +1637,7 @@ function onHostData(conn, msg) {
   const i = l.players.findIndex(p => p.id === id);
   if (i < 0) return;
   if (msg.type === "lobby" && !match) {
-    if (isColor(msg.color) && !l.players.some((p, j) => j !== i && p.color === msg.color)) l.players[i].color = msg.color;
+    if (isColor(msg.color) && !l.players.some((p, j) => j !== i && sameColor(p.color, msg.color))) l.players[i].color = msg.color;
     if (Array.isArray(msg.owned)) {
       const names = draftableGames().map(g => g.name);
       l.players[i].owned = msg.owned.filter(n => names.includes(n));
@@ -1661,7 +1716,7 @@ async function chooseOwnedOnline() {
 function pickMyColor(id) {
   prefs.myColor = id; savePrefs();
   if (net.role === "host") {
-    if (net.lobby.players.some((p, j) => j !== 0 && p.color === id)) return;
+    if (net.lobby.players.some((p, j) => j !== 0 && sameColor(p.color, id))) return;
     net.lobby.players[0].color = id; saveHostSession(); sendState(); refresh();
   } else {
     send({ type: "lobby", color: id });
@@ -1784,7 +1839,7 @@ function renderLib() {
   library.forEach((g, i) => {
     const row = document.createElement("div");
     row.className = "lib-item";
-    row.innerHTML = `<span class="name">${esc(g.name)}</span>${isMultiplayer(g) ? `<span class="muted">Multiplayer</span>` : ""}<span class="muted">${g.goals.length} goals</span>`;
+    row.innerHTML = `<span class="name">${esc(g.name)}</span>${isMultiplayer(g) ? `<span class="muted">Multiplayer${maxPlayersOf(g) ? ` (${maxPlayersOf(g)} max)` : ""}</span>` : ""}<span class="muted">${g.goals.length} goals</span>`;
     const btn = document.createElement("button");
     btn.textContent = "Edit";
     btn.onclick = () => openEditor(i);
@@ -1800,6 +1855,7 @@ function openEditor(i) {
   $("edGoals").value = g.goals.join("\n");
   $("edImage").value = gameImage(g).replace(/^game-photos\//, "");
   $("edMulti").checked = i >= 0 ? isMultiplayer(g) : false;
+  $("edMax").value = (i >= 0 && maxPlayersOf(g)) || "";
   $("deleteGame").classList.toggle("hidden", i < 0);
   $("ioPanel").classList.add("hidden");
   $("editor").classList.remove("hidden");
@@ -1813,7 +1869,8 @@ $("saveGame").onclick = () => {
   if (!name) { notice("Give the game a name."); return; }
   if (library.some((g, j) => j !== editing && g.name.toLowerCase() === name.toLowerCase())) { notice("A game with that name already exists."); return; }
   const file = $("edImage").value.trim();
-  const game = { name, goals, multi: $("edMulti").checked };
+  const max = Math.round(+$("edMax").value);
+  const game = { name, goals, multi: $("edMulti").checked, maxPlayers: max >= 2 ? max : 0 };
   if (file) game.image = file.includes("/") ? file : "game-photos/" + file;
   if (editing >= 0) library[editing] = game; else library.push(game);
   saveLib(); renderLib(); $("editor").classList.add("hidden");
