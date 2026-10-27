@@ -135,7 +135,15 @@
   .timer.planning { color: var(--accent); }
   .timer.low { color: #ff6b6b; }
   /* Personal notes: scroll counter (bottom corner) and right-click star (top corner) */
-  .cell .counter { position: absolute; bottom: 4px; right: 5px; font-size: calc(var(--gs) * var(--k) * 1.15); font-weight: 800; line-height: 1; padding: 3px 7px; border-radius: 999px; background: rgba(0,0,0,.55); color: var(--text); }
+  /* Tally widget at the bottom of every square: ◀ [ n ] ▶ */
+  .board[data-n] .cell { padding-bottom: calc(max(18px, var(--gs) * var(--k) * 1.9) + 8px); }
+  .cell .tally { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 3px; --h: max(18px, calc(var(--gs) * var(--k) * 1.9)); }
+  .cell .tally button { width: var(--h); height: var(--h); padding: 0; border-radius: 4px; background: rgba(0,0,0,.4); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: calc(var(--h) * .5); color: var(--text); }
+  .cell .tally button:hover { border-color: var(--text); background: rgba(0,0,0,.6); }
+  .cell .tally button::before { content: ""; border: solid transparent; }
+  .cell .tally .dec::before { border-width: .5em .8em .5em 0; border-right-color: currentColor; }
+  .cell .tally .inc::before { border-width: .5em 0 .5em .8em; border-left-color: currentColor; }
+  .cell .tally input { width: calc(var(--h) * 1.8); height: var(--h); padding: 0; border-radius: 4px; text-align: center; font-size: calc(var(--h) * .65); font-weight: 700; background: rgba(0,0,0,.4); }
   .cell .star { position: absolute; top: 3px; right: 5px; font-size: calc(var(--gs) * var(--k) * 1.6); line-height: 1; color: var(--accent); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
   /* During the countdown the goals are hidden; until GO squares can't be marked */
   .board.concealed .cell > * { visibility: hidden; }
@@ -1244,11 +1252,32 @@ function matchNotes() {
   return notesAll[id];
 }
 function saveNotes() { save(NOTES_KEY, notesAll); }
+function setCount(i, v) {
+  const n = matchNotes();
+  v = Math.max(0, Math.min(999, Math.floor(v) || 0));
+  if (v) n.counts[i] = v; else delete n.counts[i];
+  saveNotes();
+  return v;
+}
 function drawNotes(cell, i) {
   const n = matchNotes();
-  cell.querySelector(".counter")?.remove();
+  cell.querySelector(".tally")?.remove();
   cell.querySelector(".star")?.remove();
-  if (n.counts[i]) cell.insertAdjacentHTML("beforeend", `<span class="counter">${n.counts[i]}</span>`);
+  const t = document.createElement("div");
+  t.className = "tally";
+  t.innerHTML = `<button type="button" class="dec" aria-label="Decrease"></button>` +
+    `<input type="text" inputmode="numeric" maxlength="3" value="${n.counts[i] || 0}" aria-label="Count">` +
+    `<button type="button" class="inc" aria-label="Increase"></button>`;
+  const inp = t.querySelector("input");
+  t.querySelector(".dec").onclick = () => { inp.value = setCount(i, (+inp.value || 0) - 1); };
+  t.querySelector(".inc").onclick = () => { inp.value = setCount(i, (+inp.value || 0) + 1); };
+  inp.oninput = () => { inp.value = inp.value.replace(/\D/g, ""); };
+  inp.onchange = () => { inp.value = setCount(i, +inp.value); };
+  inp.onkeydown = e => { e.stopPropagation(); if (e.key === "Enter") inp.blur(); };
+  inp.onfocus = () => inp.select();
+  // Using the widget shouldn't mark/unmark the square
+  for (const ev of ["click", "mousedown", "dblclick"]) t.addEventListener(ev, e => e.stopPropagation());
+  cell.appendChild(t);
   if (n.stars[i]) cell.insertAdjacentHTML("beforeend", `<span class="star">★</span>`);
 }
 let lastWheel = 0;
@@ -1257,10 +1286,8 @@ function onCellWheel(e, cell, i) {
   // One step per wheel notch; ignore the flood of tiny events a touchpad sends
   if (e.timeStamp - lastWheel < 60 || e.deltaY === 0) return;
   lastWheel = e.timeStamp;
-  const n = matchNotes();
-  n.counts[i] = Math.max(0, (n.counts[i] || 0) + (e.deltaY < 0 ? 1 : -1));
-  if (!n.counts[i]) delete n.counts[i];
-  saveNotes(); drawNotes(cell, i);
+  setCount(i, (matchNotes().counts[i] || 0) + (e.deltaY < 0 ? 1 : -1));
+  drawNotes(cell, i);
 }
 function toggleStar(cell, i) {
   const n = matchNotes();
@@ -1387,7 +1414,7 @@ function renderBoard() {
   $("markHelp").innerHTML = (online
     ? `Click a square to claim it for ${teamsMatch() ? "your team" : "yourself"}. Click it again to unmark.`
     : `Pick who you're marking for above, then click a square.${K === 2 ? " Shift+click marks it for the other player." : ""} Click again to unmark.`) +
-    "<br>Right-click a square to star it. Scroll over a square to count up or down.";
+    "<br>Right-click a square to star it. Use the arrows (or scroll over a square) to keep a count.";
   $("boardActions").classList.toggle("hidden", net.role === "guest");
   $("newMatch").textContent = net.role === "host" ? "New draft" : "New match";
   let banner = "";
