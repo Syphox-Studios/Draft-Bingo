@@ -1,4 +1,4 @@
-# Draft Bingo
+# Draft Bingo V1.1
 
 Draft Bingo is a game where you and your friends will first draft the games that you will be playing then draft goals for them games. There are 18 games included in this at the moment with plans to add many more. Each game has at least 15 goals with plans to also make more for each game. 
 
