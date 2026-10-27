@@ -1,6 +1,12 @@
 # Draft Bingo
 
-A drafting bingo game for you and your friends. Static site, no build step.
+Draft Bingo is a game where you and your friends will first draft the games that you will be playing then draft goals for them games. There are 18 games included in this at the moment with plans to add many more. Each game has at least 15 goals with plans to also make more for each game. 
+
+There are currently 4 Gamemodes:
+1. **Traditional Lockout**: Once a square is claimed its locked for all other players. It's first to complete one line unless no lines are available then its first to have over half the goals.
+2. **BINGO**: First to complete the designated number of lines.
+3. **Blackout**: First to complete every square on the board.
+4. **Timed Race**: A time limit is given, it is whoever completes the most goals within that given time. Lockout and Non-Lockout versions are avaliable.
 
 ## Run it locally
 Serve the folder (fonts won't load reliably from `file://`):
