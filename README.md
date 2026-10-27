@@ -12,7 +12,7 @@ If you have more than 2 players then there is another setting called play mode, 
 1. Free For All: Everyone playing is their own team.
 2. Teams: Players are split in 2 random teams, teammates share a color and any can pick the games and goals.
 
-To **Play** click on this link: [https://sir-lion.github.io/Draft-Bingo/](https://sir-lion.github.io/Draft-Bingo/)
+To **Play** click on this link: [https://syphox-studios.github.io/Draft-Bingo/](https://syphox-studios.github.io/Draft-Bingo/)
 
 ## Run it locally
 Serve the folder (fonts won't load reliably from `file://`):
