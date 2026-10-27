@@ -8,6 +8,10 @@ There are currently 4 Gamemodes:
 3. **Blackout**: First to complete every square on the board.
 4. **Timed Race**: A time limit is given, it is whoever completes the most goals within that given time. Lockout and Non-Lockout versions are avaliable.
 
+If you have more than 2 players then there is another setting called play mode, the 2 options are below:
+1. Free For All: Everyone playing is their own team.
+2. Teams: Players are split in 2 random teams, teammates share a color and any can pick the games and goals.
+
 ## Run it locally
 Serve the folder (fonts won't load reliably from `file://`):
 
