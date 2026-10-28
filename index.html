@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Draft Bingo</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
   /* Fonts (SIL Open Font License, see fonts/OFL-*.txt). size-adjust scales Jersey 10 up to
      roughly match the size the layout was designed for. */
@@ -23,6 +24,8 @@
   header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--border); }
   header h1 { margin: 0; font-size: 20px; letter-spacing: .5px; }
   header h1 span { color: var(--accent); }
+  header .brand img { display: block; height: 60px; margin: -8px 0; }
+  .hero-logo { display: block; width: min(220px, 50vw); margin: 4px auto 22px; filter: drop-shadow(0 6px 18px rgba(0,0,0,.4)); }
   header nav { margin-left: auto; display: flex; gap: 8px; }
   main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; }
   button { font: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--panel2); color: var(--text); padding: 8px 14px; border-radius: 8px; }
@@ -226,7 +229,7 @@
 </head>
 <body>
 <header>
-  <h1>Draft <span>Bingo</span></h1>
+  <h1 class="brand"><img src="logo-text.png" alt="Draft Bingo"></h1>
   <nav>
     <button id="navPlay">Play</button>
     <button id="navLib">Game Library</button>
@@ -242,6 +245,7 @@
 <main>
   <!-- SETUP -->
   <section id="vSetup">
+    <img class="hero-logo" src="logo.png" alt="Draft Bingo v1.1">
     <div class="panel hidden" id="resumeOnline">
       <div class="row"><span id="resumeText" style="flex:1"></span><button class="primary" id="resumeOnlineBtn"></button><button id="forgetOnline">Forget</button></div>
     </div>
