@@ -663,6 +663,8 @@ function ask(message, { okLabel = "OK", cancel = true } = {}) {
   });
 }
 function notice(message) { return ask(message, { cancel: false }); }
+// A–Z by game name, for game lists
+function byName(a, b) { return a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }); }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
 
 let library = load(LIB_KEY, null) || structuredClone(DEFAULT_LIBRARY);
@@ -933,6 +935,7 @@ function draftableGames() { return library.filter(draftable).map(g => ({ name: g
 // needed: how many games everyone must share. Resolves with one array of game names per column, or null if cancelled.
 function pickOwned(games, columns, okLabel, needed) {
   return new Promise(resolve => {
+    games = [...games].sort(byName);
     const names = games.map(g => g.name);
     // Start from what each player ticked last time; games they haven't been asked about yet start ticked
     const isNew = (key, n) => prefs.ownedSeen[key] ? !prefs.ownedSeen[key].includes(n) : load(ADDED_KEY, []).includes(n);
@@ -1906,7 +1909,8 @@ let editing = null; // index or -1 for new
 function saveLib() { save(LIB_KEY, library); }
 function renderLib() {
   $("libList").innerHTML = "";
-  library.forEach((g, i) => {
+  // Listed A–Z; `i` stays the game's place in the library so Edit opens the right one
+  library.map((g, i) => [g, i]).sort((a, b) => byName(a[0], b[0])).forEach(([g, i]) => {
     const row = document.createElement("div");
     row.className = "lib-item";
     row.innerHTML = `<span class="name">${esc(g.name)}</span>${isMultiplayer(g) ? `<span class="muted">Multiplayer${maxPlayersOf(g) ? ` (${maxPlayersOf(g)} max)` : ""}</span>` : ""}<span class="muted">${g.goals.length} goals</span>`;
