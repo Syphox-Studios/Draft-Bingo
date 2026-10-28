@@ -1,6 +1,6 @@
 # Draft Bingo V1.1
 
-Draft Bingo is a game where you and your friends will first draft the games that you will be playing then draft goals for them games. There are 18 games included in this at the moment with plans to add many more. Each game has at least 15 goals with plans to also make more for each game. 
+Draft Bingo is a game where you and your friends will first draft the games that you will be playing then draft goals for them games. There are 26 games included in this at the moment with plans to add many more. Each game has at least 15 goals with plans to also make more for each game. 
 
 There are currently 4 Gamemodes:
 1. **Traditional Lockout**: Once a square is claimed its locked for all other players. It's first to complete one line unless no lines are available then its first to have over half the goals.
