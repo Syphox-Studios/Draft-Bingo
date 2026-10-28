@@ -14,6 +14,8 @@ If you have more than 2 players then there is another setting called play mode, 
 
 To **Play** click on this link: [syphox-studios.github.io/Draft-Bingo/](https://syphox-studios.github.io/Draft-Bingo/)
 
+DISCLOSURE: Ai was and is used heavily in this project, it is used purely for coding purposes. All goals, any images and all design choices are human made.
+
 ## Run it locally
 Serve the folder (fonts won't load reliably from `file://`):
 
